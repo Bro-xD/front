@@ -54,7 +54,7 @@
 </script>
 
 {#if user}
-    <div class="flex gap-5">
+    <div class="flex gap-5 style--bg">
         <div class="refuge-container w-[900px] mx-auto border-x border-gray-400 p-5 relative text-gray-600">
 
             <!-- Photo de couverture -->
@@ -97,10 +97,34 @@
 {/if}
 
 <style>
+
+    .style--bg{
+		background:
+			linear-gradient(-90deg, rgba(0,0,0,.05) 1px, transparent 1px),
+			linear-gradient(rgba(0,0,0,.05) 1px, transparent 1px), 
+			linear-gradient(-90deg, rgba(0, 0, 0, .04) 1px, transparent 1px),
+			linear-gradient(rgba(0,0,0,.04) 1px, transparent 1px),
+			linear-gradient(transparent 3px, #f2f2f2 3px, #f2f2f2 78px, transparent 78px),
+			linear-gradient(-90deg, #aaa 1px, transparent 1px),
+			linear-gradient(-90deg, transparent 3px, #f2f2f2 3px, #f2f2f2 78px, transparent 78px),
+			linear-gradient(#aaa 1px, transparent 1px),
+			#f2f2f2;
+		background-size:
+			4px 4px,
+			4px 4px,
+			80px 80px,
+			80px 80px,
+			80px 80px,
+			80px 80px,
+			80px 80px,
+			80px 80px;
+		background-position: -40px -40px;
+	}
     .refuge-container {
         position: relative;
         min-height: 100vh;
         overflow: hidden;
+        background-color: white;
     }
 
     .refuge-container div {
