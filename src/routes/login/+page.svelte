@@ -7,7 +7,7 @@
     import { goto } from '$app/navigation';
     import { onMount } from 'svelte';
 
-    let step = $state(1);
+    let step = $state(0);
 
     const avatars = [
         '/avatars/character-female-a.glb',
@@ -25,6 +25,34 @@
 
     let username = $state('');
     let password = $state('');
+
+    let loginUsername = $state('');
+    let loginPassword = $state('');
+
+    async function login() {
+        try {
+            const response = await api.post('api/login', {
+                json: { username: loginUsername, password: loginPassword }
+            }).json();
+
+            if (response.success) {
+                // stocker info utilisateur
+                userInfo.set(JSON.stringify(response.user));
+                // rediriger vers profil
+                goto('/profil', { replaceState: true });
+            } else {
+                alert('Nom d’utilisateur ou mot de passe incorrect');
+            }
+        } catch (error) {
+            console.error('Erreur lors de la connexion:', error);
+            alert('Erreur lors de la connexion');
+        }
+    }
+
+    // fonction pour passer à l'inscription si pas encore inscrit
+    function goToRegister() {
+        step = 1; 
+    }
 
     function next() {
         currentIndex = (currentIndex + 1) % avatars.length;
@@ -91,7 +119,13 @@
     <div class="flex flex-col gap-5 w-[500px] max-w-[500px] max-h-[500px] ">
         <!-- Step 1 : username et mot de passe -->
         <div class="flex flex-col gap-5">
-            <span class="text-underline text-xl font-bold border-b border-gray-400 w-max " >Etape {step}</span>
+            {#if step > 0}
+                <span class="text-underline text-xl font-bold border-b border-gray-400 w-max " >Etape {step}</span>
+            {/if}
+            {#if step == 0}
+                <span class="text-underline text-xl font-bold border-b border-gray-400 w-max " >CONNEXION</span>
+                <p class="text-gray-600 text-xl">Chaisissez votre nom de réfugié et votre cle de refuge</p>
+            {/if}
             {#if step == 1}
                 <p class="text-gray-600 text-xl">Choisis un nom de réfugié et une cle de refuge</p>
             {/if}
@@ -103,6 +137,25 @@
                 <p class="text-gray-600 text-xl">Créer votre refuge</p>
             {/if}
         </div>
+
+        {#if step === 0}
+            <div>
+                <div class="flex flex-col gap-5 w-full">
+                    <div class="flex flex-col gap-2">
+                        <label for="username">Votre nom de Réfugié</label>
+                        <input class="toon-input" type="text" placeholder="Nom de Réfugié" bind:value={loginUsername} />
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <label for="password">La cle de votre refuge</label>
+                        <input class="toon-input" type="password" placeholder="Cle de refuge" bind:value={loginPassword} />
+                    </div>
+                </div>
+                <div class="flex justify-between mt-4">
+                    <button  class="toon-button" onclick={login} disabled={!loginUsername || !loginPassword}>Se connecter</button>
+                    <button class="toon-button" onclick={goToRegister}>Créer un nouveau compte</button>
+                </div>
+            </div>
+        {/if}
         <!-- pas de form -->
         {#if step == 1}
             <div class="flex flex-col gap-5 w-full">
@@ -195,22 +248,23 @@
         </div>
         {/if}
 
-
-        <div class="flex">
-            {#if step > 1}
-                <button class="toon-button" onclick={() => step--}> {buttonTexts[step]?.prev}</button>
-            {/if}
-            <span class="flex-grow"></span>
-            <button class="toon-button"
-                disabled={!canContinue} 
-                onclick={() => {
-                        if (step === 3) {
-                            createRefuge();
-                        } else {
-                            step++;
-                    }
-            }}>{buttonTexts[step].next}</button>
-        </div>
+        {#if step > 0}
+            <div class="flex">
+                {#if step > 1}
+                    <button class="toon-button" onclick={() => step--}> {buttonTexts[step]?.prev}</button>
+                {/if}
+                <span class="flex-grow"></span>
+                <button class="toon-button"
+                    disabled={!canContinue} 
+                    onclick={() => {
+                            if (step === 3) {
+                                createRefuge();
+                            } else {
+                                step++;
+                        }
+                }}>{buttonTexts[step].next}</button>
+            </div>
+        {/if}
 
     </div>
 </div>
